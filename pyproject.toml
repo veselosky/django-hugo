@@ -1,0 +1,28 @@
+[project]
+name = "django-hugo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Vince Veselosky", email = "vince@control-escape.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "celery>=5.5.2",
+    "django>=5.2.1",
+    "hiredis>=3.2.1",
+    "pillow>=11.2.1",
+    "redis>=6.2.0",
+]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "django-debug-toolbar>=5.2.0",
+    "django-extensions>=4.1",
+    "djlint>=1.36.4",
+    "rich>=14.0.0",
+]

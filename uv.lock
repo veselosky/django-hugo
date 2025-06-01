@@ -183,7 +183,9 @@ dependencies = [
     { name = "django" },
     { name = "hiredis" },
     { name = "pillow" },
+    { name = "pyyaml" },
     { name = "redis" },
+    { name = "tomli" },
 ]
 
 [package.dev-dependencies]
@@ -200,7 +202,9 @@ requires-dist = [
     { name = "django", specifier = ">=5.2.1" },
     { name = "hiredis", specifier = ">=3.2.1" },
     { name = "pillow", specifier = ">=11.2.1" },
+    { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "redis", specifier = ">=6.2.0" },
+    { name = "tomli", specifier = ">=2.2.1" },
 ]
 
 [package.metadata.requires-dev]

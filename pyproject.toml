@@ -12,7 +12,9 @@ dependencies = [
     "django>=5.2.1",
     "hiredis>=3.2.1",
     "pillow>=11.2.1",
+    "pyyaml>=6.0.2",
     "redis>=6.2.0",
+    "tomli>=2.2.1",
 ]
 
 [build-system]

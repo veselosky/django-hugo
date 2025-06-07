@@ -16,6 +16,7 @@
   },
   "python.testing.unittestArgs": [
     "-p",
-    "./tests/*test*.py"
+    "*test*.py",
+    "./tests"
   ]
 }

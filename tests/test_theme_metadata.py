@@ -4,7 +4,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from django_hugo.themes.config import ThemeMetadata, load_theme_metadata
+from django_hugo.themes.config import load_theme_metadata
 
 # language: python
 

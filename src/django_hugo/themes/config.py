@@ -18,7 +18,6 @@ This module contains Pydantic models for Hugo's theme.toml file.
 """
 
 from pathlib import Path
-from typing import List, Optional, Union
 
 import tomli
 from PIL import Image
@@ -35,34 +34,34 @@ from typing_extensions import Self
 
 class Author(BaseModel):
     name: str
-    homepage: Optional[HttpUrl]
+    homepage: HttpUrl | None
 
 
 class OriginalAuthor(BaseModel):
     author: str
-    homepage: Optional[HttpUrl]
-    repo: Optional[HttpUrl]
+    homepage: HttpUrl | None
+    repo: HttpUrl | None
 
 
 class ThemeMetadata(BaseModel):
     # Required fields from theme.toml
     name: str
     license: str
-    licenselink: Optional[HttpUrl] = None
+    licenselink: HttpUrl | None = None
     description: str
     homepage: HttpUrl
 
     # Optional fields from theme.toml
-    demosite: Optional[HttpUrl] = None
-    tags: Optional[List[str]] = []
-    features: Optional[List[str]] = []
+    demosite: HttpUrl | None = None
+    tags: list[str] | None = []
+    features: list[str] | None = []
 
     # Single-author or multi-author support
-    author: Optional[Author] = None
-    authors: Optional[List[Author]] = None
+    author: Author | None = None
+    authors: list[Author] | None = None
 
     # Optional “original” metadata
-    original: Optional[OriginalAuthor] = None
+    original: OriginalAuthor | None = None
 
     # Paths to images (screenshot and thumbnail)
     screenshot: FilePath
@@ -151,7 +150,7 @@ class ThemeMetadata(BaseModel):
         return self
 
 
-def load_theme_metadata(toml_path: Union[str, Path]) -> ThemeMetadata:
+def load_theme_metadata(toml_path: str | Path) -> ThemeMetadata:
     """
     Load and validate Hugo theme metadata from a theme.toml file.
 
@@ -164,6 +163,7 @@ def load_theme_metadata(toml_path: Union[str, Path]) -> ThemeMetadata:
     Raises:
         FileNotFoundError: If the theme.toml file or required images are not found.
         ValueError: If the theme.toml file is invalid or does not meet the required criteria.
+        pydantic.ValidationError: If the data does not conform to the ThemeMetadata model.
     """
     toml_path = Path(toml_path)
     if not toml_path.is_file():
@@ -203,5 +203,4 @@ def load_theme_metadata(toml_path: Union[str, Path]) -> ThemeMetadata:
         data["thumbnail"] = str(thumbnail_jpg.resolve())
 
     # Validate and instantiate the Pydantic model
-    theme_metadata = ThemeMetadata(**data)
-    return theme_metadata
+    return ThemeMetadata.model_validate(data)

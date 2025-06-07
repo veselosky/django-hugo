@@ -13,3 +13,17 @@
 
 # You should have received a copy of the GNU Affero General Public License
 # along with this package.  If not, see <https://www.gnu.org/licenses/>.
+"""
+This module aggregates the models for the Django Hugo application, providing a single
+import point for the main models used in the application. It includes models for Hugo sites
+and themes, which are essential components for managing Hugo-based static sites within a
+Django project.
+"""
+
+from django_hugo.sites.models import HugoSite
+from django_hugo.themes.models import HugoTheme
+
+__all__ = [
+    "HugoSite",
+    "HugoTheme",
+]

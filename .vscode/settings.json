@@ -9,5 +9,13 @@
   "python.analysis.autoImportCompletions": true,
   "python.testing.unittestEnabled": true,
   "python.testing.pytestEnabled": false,
-  "python.analysis.typeCheckingMode": "basic"
+  "python.analysis.typeCheckingMode": "basic",
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true
+  },
+  "python.testing.unittestArgs": [
+    "-p",
+    "./tests/*test*.py"
+  ]
 }

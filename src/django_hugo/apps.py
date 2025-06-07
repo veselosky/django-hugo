@@ -13,7 +13,10 @@
 
 # You should have received a copy of the GNU Affero General Public License
 # along with this package.  If not, see <https://www.gnu.org/licenses/>.
+from pathlib import Path
+
 from django.apps import AppConfig, apps
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 
@@ -27,5 +30,23 @@ class DjangoHugoConfig(AppConfig):
         if not apps.ready:
             return
 
-        # Import the signals and tasks to ensure they are registered
-        from . import signals, tasks  # noqa: F401
+        # Import the checks, signals, and tasks to ensure they are registered
+        from . import checks, signals, tasks  # noqa: F401
+
+    @property
+    def SITES_ROOT(self) -> Path:
+        """
+        Returns the root directory for Hugo sites.
+        This is configurable via the HUGO_SITES_ROOT setting.
+        """
+        # Note: Will raise an error if the setting is not defined
+        return Path(settings.HUGO_SITES_ROOT)
+
+    @property
+    def THEMES_ROOT(self) -> Path:
+        """
+        Returns the root directory for Hugo themes.
+        This is configurable via the HUGO_THEMES_ROOT setting.
+        """
+        # Note: Will raise an error if the setting is not defined
+        return Path(settings.HUGO_THEMES_ROOT)

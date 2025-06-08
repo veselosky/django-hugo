@@ -1,0 +1,34 @@
+from django.apps import apps
+from django.core.management.base import BaseCommand
+
+from django_hugo.themes.actions import sync_themes
+
+config = apps.get_app_config("django_hugo")
+
+
+class Command(BaseCommand):
+    """
+    What this command does:
+    - For each Hugo site in the database, check if the corresponding files exist.
+    - If files are missing, log a warning.
+    - If files are present, ensure the database is in sync with the Hugo files.
+    - If the database is not in sync, update the database with the latest data from the Hugo files.
+    - If the database is in sync, log a success message.
+    - For each Hugo theme in the database, check if the corresponding files exist.
+    - If theme files are missing, log a warning.
+    - If theme files are present, ensure the database is in sync with the Hugo theme files.
+    - For each directory in the HUGO_THEMES_DIR setting, check if a Theme model exists
+    - If a Theme model does not exist, create it with the appropriate metadata.
+    """
+
+    help = "Ensures the Django database is in sync with Hugo files."
+
+    def add_arguments(self, parser):
+        return super()
+
+    def handle(self, *args, **options):
+        """
+        Main entry point for the command.
+        """
+        # Sync Hugo themes
+        sync_themes(config.THEMES_ROOT)

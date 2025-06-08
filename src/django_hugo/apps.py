@@ -50,3 +50,20 @@ class DjangoHugoConfig(AppConfig):
         """
         # Note: Will raise an error if the setting is not defined
         return Path(settings.HUGO_THEMES_ROOT)
+
+    @property
+    def HUGO_PATH(self) -> Path:
+        """
+        Returns the path to the Hugo executable.
+        This is configurable via the HUGO_PATH setting.
+        """
+        # Note: Will raise an error if the setting is not defined
+        return Path(settings.HUGO_PATH)
+
+    @property
+    def HUGO_COMMAND_TIMEOUT(self) -> int:
+        """
+        Returns the timeout for Hugo commands in seconds.
+        This is configurable via the HUGO_COMMAND_TIMEOUT setting.
+        """
+        return getattr(settings, "HUGO_COMMAND_TIMEOUT", 30)

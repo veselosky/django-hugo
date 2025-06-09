@@ -60,6 +60,7 @@ HUGO_SITES_ROOT = DATA_DIR / "hugo_sites"
 HUGO_SITES_ROOT.mkdir(parents=True, exist_ok=True)
 HUGO_THEMES_ROOT = DATA_DIR / "hugo_themes"
 HUGO_THEMES_ROOT.mkdir(parents=True, exist_ok=True)
+HUGO_PATH = env("HUGO_PATH")
 
 # ManifestStaticFilesStorage is recommended in production, to prevent outdated
 # Javascript / CSS assets being served from cache.
@@ -199,6 +200,68 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+LOG_DIR = env("LOG_DIR", default=DATA_DIR / "logs")
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,  # Keeps Django's default loggers and handlers
+    "formatters": {
+        "detailed": {
+            "format": "{asctime} [{levelname}] {name}.{module}:{lineno} - {message}",
+            "style": r"{",
+        },
+        "rich": {
+            "datefmt": "[%X]",
+        },
+    },
+    "handlers": {
+        # In dev, log to a file for debugging, rotate daily for a fresh start.
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": LOG_DIR / "django.log",
+            "when": "midnight",  # Rotate logs daily at midnight
+            "interval": 1,  # Every 1 day
+            "backupCount": 7,  # Keep last 7 days of logs
+            "encoding": "utf-8",
+            "formatter": "detailed",
+        },
+        # Beautiful and useful console output with rich
+        # https://www.willmcgugan.com/blog/tech/post/richer-django-logging/
+        "console": {
+            "level": "DEBUG",
+            "class": "rich.logging.RichHandler",
+            "formatter": "rich",
+        },
+    },
+    "loggers": {
+        # Django declares the "django" logger, but sends output only to console.
+        "django": {
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": False,  # Prevent duplicate logging
+        },
+        # "django.server" is effectively the access log. Django's default sends
+        # it only to console.
+        "django.server": {
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        # Log messages from your own project at DEBUG level.
+        "django_hugo": {
+            "handlers": ["file", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        # Third party libraries can be noisy, adjust accordingly.
+        "": {
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
 
 #######################################################################################
 # SECTION: DEVELOPMENT TOOLS

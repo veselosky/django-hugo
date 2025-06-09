@@ -28,7 +28,7 @@ from django_hugo.themes.models import HugoTheme
 config = apps.get_app_config("django_hugo")
 HUGO_THEMES_ROOT = config.THEMES_ROOT
 
-__all__ = ["sync_themes"]
+__all__ = ["find_theme_files", "sync_themes"]
 
 
 def find_theme_files(path: Path = HUGO_THEMES_ROOT) -> list[Path]:

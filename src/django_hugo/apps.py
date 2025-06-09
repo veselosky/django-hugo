@@ -13,11 +13,15 @@
 
 # You should have received a copy of the GNU Affero General Public License
 # along with this package.  If not, see <https://www.gnu.org/licenses/>.
+import logging
 from pathlib import Path
 
-from django.apps import AppConfig, apps
+from django.apps import AppConfig
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+
+logger = logging.getLogger(__name__)
+__all__ = ["DjangoHugoConfig"]
 
 
 class DjangoHugoConfig(AppConfig):
@@ -26,10 +30,7 @@ class DjangoHugoConfig(AppConfig):
     verbose_name = _("Django Hugo")
 
     def ready(self):
-        # Ensure that the app is registered before accessing its models
-        if not apps.ready:
-            return
-
+        logger.debug("DjangoHugoConfig in ready; loading checks, signals, and tasks")
         # Import the checks, signals, and tasks to ensure they are registered
         from . import checks, signals, tasks  # noqa: F401
 

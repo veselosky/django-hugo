@@ -1,18 +1,17 @@
-baseURL = '{{ base_url }}'
-copyright = '{{ copyright }}'
-description = '{{ description }}'
-environment = '{{ environment }}'
+baseURL = '{{ site.base_url }}'
+copyright = '{{ site.copyright }}'
+description = '{{ site.description }}'
 languageCode = 'en-us'
-title = '{{ title }}'
-theme = '{{ theme }}'
+title = '{{ site.title }}'
+theme = '{{ site.theme }}'
 
 disableLiveReload = true
-enableEmoji = {{ enable_emoji }}
-enableRobotsTXT = {{ enable_robots }}
+enableEmoji = {{ site.enable_emoji }}
+enableRobotsTXT = {{ site.enable_robots }}
 pluralizeListTitles = false
 
 [pagination]
-pagerSize = {{ pager_size }}
+pagerSize = {{ site.pager_size }}
 
 {% comment %}
 Configure how Hugo's date methods will pull from front matter.

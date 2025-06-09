@@ -312,8 +312,8 @@ class HugoConfig(BaseModel):
     # https://gohugo.io/configuration/permalinks/
     # For now we use a fixed configuration, but may expose this for customization later.
     permalinks: dict | None = None
-    pluralizelistTitles: bool | None = Field(
-        default=None,
+    pluralizeListTitles: bool | None = Field(
+        default=False,
         validation_alias=AliasChoices("pluralizelistTitles", "pluralizelisttitles"),
     )
     # https://gohugo.io/configuration/privacy/

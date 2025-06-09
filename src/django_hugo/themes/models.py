@@ -36,9 +36,10 @@ class HugoTheme(models.Model):
     """
 
     name = models.CharField(
-        max_length=255, unique=True, help_text=_("Name of the theme")
+        _("name"), max_length=255, unique=True, help_text=_("Name of the theme")
     )
     toml_path = models.FilePathField(
+        verbose_name=_("path to theme.toml"),
         path=HUGO_THEMES_ROOT,
         max_length=255,
         recursive=True,
@@ -46,9 +47,12 @@ class HugoTheme(models.Model):
         help_text=_("Path to the theme.toml file within the theme directory"),
     )
     description = models.TextField(
-        blank=True, help_text=_("Optional description of the Hugo theme")
+        _("description"),
+        blank=True,
+        help_text=_("Optional description of the Hugo theme"),
     )
     active = models.BooleanField(
+        _("active"),
         default=True,
         help_text=_("If active, this theme can be used by Hugo sites"),
     )

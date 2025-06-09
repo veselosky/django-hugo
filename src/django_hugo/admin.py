@@ -13,3 +13,77 @@
 
 # You should have received a copy of the GNU Affero General Public License
 # along with this package.  If not, see <https://www.gnu.org/licenses/>.
+from __future__ import annotations
+
+from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
+
+from django_hugo.models import HugoSite, HugoTheme
+
+
+@admin.register(HugoSite)
+class HugoSiteAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "slug",
+        "user",
+        "theme",
+        "last_published",
+        "archived",
+        "has_unpublished_changes",
+    )
+    list_filter = ("archived", "theme", "user")
+    search_fields = ("name", "slug", "title", "description")
+    readonly_fields = ("last_published", "has_unpublished_changes", "archived")
+    # TODO: actions = ["publish_site", "archive_site"]
+    fieldsets = (
+        (
+            _("Site Information"),
+            {
+                "fields": (
+                    "name",
+                    "slug",
+                    "base_url",
+                    "title",
+                    "description",
+                    "copyright",
+                    "pager_size",
+                    "theme",
+                    "enable_emoji",
+                    "enable_robots",
+                )
+            },
+        ),
+        (
+            _("Ownership & Status"),
+            {
+                "fields": (
+                    "user",
+                    "last_published",
+                    "archived",
+                    "has_unpublished_changes",
+                )
+            },
+        ),
+    )
+
+
+@admin.register(HugoTheme)
+class HugoThemeAdmin(admin.ModelAdmin):
+    list_display = ("name", "active", "description")
+    list_filter = ("active",)
+    search_fields = ("name", "description")
+    readonly_fields = ()
+    fieldsets = (
+        (
+            _("Theme Information"),
+            {
+                "fields": (
+                    "name",
+                    "toml_path",
+                    "description",
+                    "active",
+                )
+            },
+        ),
+    )

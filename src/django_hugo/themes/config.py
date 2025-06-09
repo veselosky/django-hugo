@@ -191,11 +191,11 @@ def load_theme_metadata(toml_path: str | Path) -> ThemeMetadata:
     else:
         data["screenshot"] = str(screenshot_jpg.resolve())
 
-    thumbnail_png = images_dir / "thumbnail.png"
-    thumbnail_jpg = images_dir / "thumbnail.jpg"
+    thumbnail_png = images_dir / "tn.png"
+    thumbnail_jpg = images_dir / "tn.jpg"
     if not (thumbnail_png.is_file() or thumbnail_jpg.is_file()):
         raise FileNotFoundError(
-            f"Thumbnail image not found in {images_dir}. Expected thumbnail.png or thumbnail.jpg."
+            f"Thumbnail image not found in {images_dir}. Expected tn.png or tn.jpg."
         )
     if thumbnail_png.is_file():
         data["thumbnail"] = str(thumbnail_png.resolve())

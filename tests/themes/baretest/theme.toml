@@ -1,0 +1,23 @@
+name = "Bare Test Theme"
+license = "MIT"
+description = "A bare theme for testing django-hugo. Outputs are for tests to parse, not for humans to read."
+
+# The home page of the theme, where the source can be found.
+homepage = "https://github.com/webquills/django-hugo"
+
+# If you have a running demo of the theme.
+# demosite = "https://gohugo.io"
+
+tags = ["blog", "company"]
+features = ["tags", "categories", "authors", "series"]
+
+# If the theme has multiple authors
+# authors = [
+#   {name = "Name of author", homepage = "Website of author"},
+#   {name = "Name of author", homepage = "Website of author"}
+# ]
+
+# If the theme has a single author
+[author]
+    name = "Vince Veselosky"
+    homepage = "https://www.webquills.com/"

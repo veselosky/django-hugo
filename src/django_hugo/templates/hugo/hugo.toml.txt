@@ -1,0 +1,40 @@
+baseURL = '{{ site.base_url }}'
+copyright = '{{ site.copyright }}'
+description = '{{ site.description }}'
+languageCode = 'en-us'
+title = '{{ site.title }}'
+theme = '{{ site.theme }}'
+
+disableLiveReload = true
+enableEmoji = {{ site.enable_emoji }}
+enableRobotsTXT = {{ site.enable_robots }}
+pluralizeListTitles = false
+
+[pagination]
+pagerSize = {{ site.pager_size }}
+
+{% comment %}
+Configure how Hugo's date methods will pull from front matter.
+Most Hugo themes use the `date` field as the primary sort. Here's what Hugo uses as default:
+[frontmatter]
+  date = ['date', 'publishdate', 'pubdate', 'published', 'lastmod', 'modified']
+  expiryDate = ['expirydate', 'unpublishdate']
+  lastmod = [':git', 'lastmod', 'modified', 'date', 'publishdate', 'pubdate', 'published']
+  publishDate = ['publishdate', 'pubdate', 'published', 'date']
+
+For most applications, it makes more sense to prioritize the most recent editorial
+change rather than the first, so we override the defaults here. Also, we add aliases
+to match the schema.org names.
+{% endcomment %}
+[frontmatter]
+date = ["date", 'lastmod', 'datemodified', 'modified', "publishdate", "pubdate", "published", "datepublished"]
+lastmod = ['lastmod', 'datemodified', 'modified', 'date', "publishdate", "pubdate", "published", "datepublished"]
+publishDate = ["publishdate", "pubdate", "published", "datepublished", "date"]
+expiryDate = ['expirydate', 'unpublishdate', "expires"]
+
+[module]
+    [module.hugoVersion]
+        min = " 0.146.1"  # Implements the "new" template scheme ("_shortcodes" vs "shortcodes", etc.).
+    [[module.mounts]]
+        source = '{{ HUGO_THEMES_ROOT }}'
+        target = 'themes'

@@ -38,11 +38,13 @@ jobs:
           pwd
           ls -la
           hugo version
+          which hugo
           python --version
           pip --version
           tox --version
 
+      - name: Set HUGO_PATH environment variable
+        run: echo "HUGO_PATH=$(which hugo)" >> $GITHUB_ENV
+
       - name: Run the test suite
-        env:
-          HUGO_PATH: bin/hugo
         run: tox run

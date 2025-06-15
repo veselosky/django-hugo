@@ -25,17 +25,65 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from importlib.util import find_spec
 from pathlib import Path
+
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Get environment settings.
+env = environ.Env()
+DOTENV = BASE_DIR / ".env"
+if DOTENV.exists() and not env.bool("IGNORE_ENV_FILE", default=False):
+    environ.Env.read_env(DOTENV)
+
+# Local data written by the app should be kept in one directory for ease of backup.
+# In DEV this can be a subdir of BASE_DIR. In production, for single-server setups
+# this should be a directory outside BASE_DIR that is backed up on a regular basis.
+# For scalable configurations, you should not use local paths but external services
+# like S3 and a dedicated database server.
+DATA_DIR = Path(env("DATA_DIR", default=BASE_DIR.joinpath("var")))
+
+# Static files (CSS, JavaScript, Images) and Media files (user uploads)
+# https://docs.djangoproject.com/en/dev/howto/static-files/
+STATIC_URL = "/static/"
+STATIC_ROOT = DATA_DIR / "static"
+STATIC_ROOT.mkdir(parents=True, exist_ok=True)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = DATA_DIR / "media"
+MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+
+# Django-Hugo settings
+HUGO_PATH = Path(env("HUGO_PATH", default="hugo"))
+HUGO_SITES_ROOT = Path(env("HUGO_SITES_ROOT", default=DATA_DIR / "hugo_sites"))
+HUGO_THEMES_ROOT = Path(env("HUGO_THEMES_ROOT", default=DATA_DIR / "hugo_themes"))
+
+# ManifestStaticFilesStorage is recommended in production, to prevent outdated
+# Javascript / CSS assets being served from cache.
+# See https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#manifeststaticfilesstorage
+# But for production, you almost certainly should be using a shared storage backend, like:
+# https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+STORAGES = {
+    "default": {
+        "BACKEND": env(
+            "DEFAULT_STORAGE", default="django.core.files.storage.FileSystemStorage"
+        ),
+    },
+    "staticfiles": {
+        "BACKEND": env(
+            "STATICFILES_STORAGE",
+            default="django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+        ),
+    },
+}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-vhxi#$w6-(^2(*3w(9w0r48(i5g1^x&@j9hp&&@12*frmefjn9"
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -46,6 +94,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "django_hugo",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -85,15 +134,34 @@ WSGI_APPLICATION = "testproject.wsgi.application"
 
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# https://docs.djangoproject.com/en/dev/ref/settings/#databases
+# A default path for development, but you should set DATABASE_URL in production.
+DB_DIR = DATA_DIR / "db"
+SQLITE_DB = DB_DIR / "db.sqlite3"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+# These settings will dramatically improve concurrency performance if using
+# SQLite. Note, these options only work in Django 5.1+
+# https://kerkour.com/sqlite-for-servers
+SQLITE_PRAGMAS = """PRAGMA journal_mode = WAL;
+PRAGMA busy_timeout = 5000;
+PRAGMA synchronous = NORMAL;
+PRAGMA cache_size = 1000000000;
+PRAGMA foreign_keys = true;
+PRAGMA temp_store = memory;"""
+SQLITE_OPTIONS = {
+    "transaction_mode": "IMMEDIATE",
+    "init_command": SQLITE_PRAGMAS,
 }
 
+DATABASES = {"default": env.db("DATABASE_URL", default=f"sqlite:///{SQLITE_DB}")}
+if DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
+    DATABASES["default"]["OPTIONS"] = SQLITE_OPTIONS
+    DB_DIR.mkdir(parents=True, exist_ok=True)
+
+# Email settings don't use a dict. Add to local vars instead.
+# https://django-environ.readthedocs.io/en/latest/tips.html#email-settings
+EMAIL_CONFIG = env.email_url("EMAIL_URL", default="consolemail://")
+vars().update(EMAIL_CONFIG)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -126,12 +194,95 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = "static/"
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+LOG_DIR = Path(env("LOG_DIR", default=DATA_DIR / "logs"))
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+LOG_HANDLER = "logging.StreamHandler"
+if find_spec("rich"):
+    # If rich is installed, use its handler for console output.
+    # https://www.willmcgugan.com/blog/tech/post/richer-django-logging/
+    LOG_HANDLER = "rich.logging.RichHandler"
+# Logging configuration
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,  # Keeps Django's default loggers and handlers
+    "formatters": {
+        "detailed": {
+            "format": "{asctime} [{levelname}] {name}.{module}:{lineno} - {message}",
+            "style": r"{",
+        },
+        "rich": {
+            "datefmt": "[%X]",
+        },
+    },
+    "handlers": {
+        # In dev, log to a file for debugging, rotate daily for a fresh start.
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": LOG_DIR / "django.log",
+            "when": "midnight",  # Rotate logs daily at midnight
+            "interval": 1,  # Every 1 day
+            "backupCount": 7,  # Keep last 7 days of logs
+            "encoding": "utf-8",
+            "formatter": "detailed",
+        },
+        "console": {
+            "level": "DEBUG",
+            "class": LOG_HANDLER,
+            "formatter": "rich",
+        },
+    },
+    "loggers": {
+        # Django declares the "django" logger, but sends output only to console.
+        "django": {
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": False,  # Prevent duplicate logging
+        },
+        # "django.server" is effectively the access log. Django's default sends
+        # it only to console.
+        "django.server": {
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        # Log messages from your own project at DEBUG level.
+        "django_hugo": {
+            "handlers": ["file", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "tests": {
+            "handlers": ["file", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        # Third party libraries can be noisy, adjust accordingly.
+        "": {
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
+#######################################################################################
+# SECTION: DEVELOPMENT TOOLS
+#######################################################################################
+if DEBUG:
+    ALLOWED_HOSTS = ["*"]
+    # Certain debug features are only available if the client is in INTERNAL_IPS.
+    INTERNAL_IPS = ["127.0.0.1"]
+
+    # Install the Django Debug Toolbar if it is available.
+    # See also urls.py for debug_toolbar urls
+    if find_spec("debug_toolbar"):
+        INSTALLED_APPS.append("debug_toolbar")
+        MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
+
+    if find_spec("django_extensions"):
+        INSTALLED_APPS.append("django_extensions")

@@ -10,9 +10,16 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
+        hugo-version: ["0.146.1", "latest"]
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: ${{ matrix.hugo-version }}
+          extended: true
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -24,7 +31,20 @@ jobs:
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install build "tox>=4.7.0" "tox-gh-actions>=3.0.0"
+          pip install "tox>=4.7.0" "tox-gh-actions>=3.0.0"
+
+      - name: Debug environment
+        run: |
+          pwd
+          ls -la
+          hugo version
+          which hugo
+          python --version
+          pip --version
+          tox --version
+
+      - name: Set HUGO_PATH environment variable
+        run: echo "HUGO_PATH=$(which hugo)" >> $GITHUB_ENV
 
       - name: Run the test suite
         run: tox run

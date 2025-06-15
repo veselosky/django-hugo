@@ -1,3 +1,4 @@
+import logging
 import tempfile
 import unittest
 from pathlib import Path
@@ -6,7 +7,8 @@ from PIL import Image
 
 from django_hugo.themes.config import load_theme_metadata
 
-# language: python
+# Configure logging for the test module
+logger = logging.getLogger(__name__)
 
 
 def create_dummy_image(path: Path, width: int, height: int):
@@ -19,18 +21,21 @@ class TestThemeMetadata(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.base_path = Path(self.temp_dir.name)
+        logger.debug(f"Temporary directory created at: {self.base_path}")
 
     def tearDown(self):
         self.temp_dir.cleanup()
+        logger.debug(f"Temporary directory cleaned up: {self.base_path}")
 
     def create_dummy_files(self, screenshot_size, thumbnail_size):
         """Create dummy screenshot and thumbnail images in the temp directory."""
         img_path = self.base_path / "images"
         img_path.mkdir(parents=True, exist_ok=True)
         screenshot_path = img_path / "screenshot.png"
-        thumbnail_path = img_path / "thumbnail.png"
+        thumbnail_path = img_path / "tn.png"
         create_dummy_image(screenshot_path, *screenshot_size)
         create_dummy_image(thumbnail_path, *thumbnail_size)
+        logger.debug(f"Created dummy files: {screenshot_path}, {thumbnail_path}")
         return screenshot_path, thumbnail_path
 
     def write_toml(self, data: str, filename: str = "theme.toml") -> Path:
@@ -38,6 +43,7 @@ class TestThemeMetadata(unittest.TestCase):
         toml_path = self.base_path / filename
         with open(toml_path, "w", encoding="utf-8") as f:
             f.write(data)
+        logger.debug(f"Wrote TOML data to: {toml_path}")
         return toml_path
 
     def test_valid_metadata_loading(self):

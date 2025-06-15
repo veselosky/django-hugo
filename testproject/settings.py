@@ -36,7 +36,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Get environment settings.
 env = environ.Env()
 DOTENV = BASE_DIR / ".env"
-if DOTENV.exists() and not env("IGNORE_ENV_FILE", default=False):
+if DOTENV.exists() and not env.bool("IGNORE_ENV_FILE", default=False):
     environ.Env.read_env(DOTENV)
 
 # Local data written by the app should be kept in one directory for ease of backup.
@@ -60,7 +60,7 @@ HUGO_SITES_ROOT = DATA_DIR / "hugo_sites"
 HUGO_SITES_ROOT.mkdir(parents=True, exist_ok=True)
 HUGO_THEMES_ROOT = DATA_DIR / "hugo_themes"
 HUGO_THEMES_ROOT.mkdir(parents=True, exist_ok=True)
-HUGO_PATH = env("HUGO_PATH")
+HUGO_PATH = Path(env("HUGO_PATH", default="hugo"))
 
 # ManifestStaticFilesStorage is recommended in production, to prevent outdated
 # Javascript / CSS assets being served from cache.
@@ -200,8 +200,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-LOG_DIR = env("LOG_DIR", default=DATA_DIR / "logs")
+LOG_DIR = Path(env("LOG_DIR", default=DATA_DIR / "logs"))
 LOG_DIR.mkdir(parents=True, exist_ok=True)
+LOG_HANDLER = "logging.StreamHandler"
+if find_spec("rich"):
+    # If rich is installed, use its handler for console output.
+    # https://www.willmcgugan.com/blog/tech/post/richer-django-logging/
+    LOG_HANDLER = "rich.logging.RichHandler"
+# Logging configuration
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,  # Keeps Django's default loggers and handlers
@@ -226,11 +232,9 @@ LOGGING = {
             "encoding": "utf-8",
             "formatter": "detailed",
         },
-        # Beautiful and useful console output with rich
-        # https://www.willmcgugan.com/blog/tech/post/richer-django-logging/
         "console": {
             "level": "DEBUG",
-            "class": "rich.logging.RichHandler",
+            "class": LOG_HANDLER,
             "formatter": "rich",
         },
     },
@@ -250,6 +254,11 @@ LOGGING = {
         },
         # Log messages from your own project at DEBUG level.
         "django_hugo": {
+            "handlers": ["file", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "tests": {
             "handlers": ["file", "console"],
             "level": "DEBUG",
             "propagate": False,

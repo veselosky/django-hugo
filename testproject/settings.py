@@ -56,11 +56,9 @@ MEDIA_ROOT = DATA_DIR / "media"
 MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
 # Django-Hugo settings
-HUGO_SITES_ROOT = DATA_DIR / "hugo_sites"
-HUGO_SITES_ROOT.mkdir(parents=True, exist_ok=True)
-HUGO_THEMES_ROOT = DATA_DIR / "hugo_themes"
-HUGO_THEMES_ROOT.mkdir(parents=True, exist_ok=True)
 HUGO_PATH = Path(env("HUGO_PATH", default="hugo"))
+HUGO_SITES_ROOT = Path(env("HUGO_SITES_ROOT", default=DATA_DIR / "hugo_sites"))
+HUGO_THEMES_ROOT = Path(env("HUGO_THEMES_ROOT", default=DATA_DIR / "hugo_themes"))
 
 # ManifestStaticFilesStorage is recommended in production, to prevent outdated
 # Javascript / CSS assets being served from cache.

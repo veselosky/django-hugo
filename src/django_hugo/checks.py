@@ -46,7 +46,7 @@ def check_hugo_settings(app_configs, **kwargs):
         if not sites_root.exists():
             errors.append(
                 Error(
-                    "HUGO_SITES_ROOT does not exist.",
+                    f"HUGO_SITES_ROOT='{sites_root}' does not exist.",
                     hint="Please ensure the directory exists.",
                     id="django_hugo.E002",
                 )
@@ -60,7 +60,7 @@ def check_hugo_settings(app_configs, **kwargs):
             except Exception:
                 errors.append(
                     Error(
-                        "Cannot write to HUGO_SITES_ROOT",
+                        f"Cannot write to HUGO_SITES_ROOT='{sites_root}'",
                         hint="Please check the permissions of the directory.",
                         id="django_hugo.E003",
                     )
@@ -82,7 +82,7 @@ def check_hugo_settings(app_configs, **kwargs):
         if not themes_root.exists():
             errors.append(
                 Error(
-                    "HUGO_THEMES_ROOT does not exist.",
+                    f"HUGO_THEMES_ROOT='{themes_root}' does not exist.",
                     hint="Please ensure the directory exists.",
                     id="django_hugo.E012",
                 )
@@ -95,7 +95,7 @@ def check_hugo_settings(app_configs, **kwargs):
             if not theme_files:
                 errors.append(
                     Error(
-                        "No themes found in HUGO_THEMES_ROOT.",
+                        f"No themes found in HUGO_THEMES_ROOT='{themes_root}'",
                         hint="You need to install at least one theme for django_hugo to use.",
                         id="django_hugo.E013",
                     )
@@ -116,7 +116,7 @@ def check_hugo_settings(app_configs, **kwargs):
         if not hugo_path.exists():
             errors.append(
                 Error(
-                    "HUGO_PATH does not exist.",
+                    f"HUGO_PATH='{hugo_path}' does not exist.",
                     hint="Please ensure the Hugo executable path is correct.",
                     id="django_hugo.E005",
                 )
@@ -137,7 +137,7 @@ def check_hugo_settings(app_configs, **kwargs):
                 errors.append(
                     Error(
                         "Unable to determine Hugo version.",
-                        hint="Ensure the `HUGO_PATH` is correct and this user has permission to execute Hugo.",
+                        hint=f"Ensure the `HUGO_PATH={hugo_path}` is correct and this user has permission to execute Hugo.",
                         id="django_hugo.E008",
                     )
                 )

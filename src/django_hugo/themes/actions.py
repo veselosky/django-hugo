@@ -56,17 +56,18 @@ def sync_themes(path: Path = HUGO_THEMES_ROOT):
     This will create new HugoTheme instances for any themes found in the file system
     that are not already in the database.
     """
+    # Keyed by the relative_dir for easy lookup
     available_themes = {
-        str(theme_file.resolve()): load_theme_metadata(theme_file)
+        str(theme_file.parent.relative_to(path)): load_theme_metadata(theme_file)
         for theme_file in find_theme_files(path)
     }
-    existing_themes = HugoTheme.objects.values_list("toml_path", flat=True)
+    existing_themes = HugoTheme.objects.values_list("relative_dir", flat=True)
 
-    for theme_toml, theme in available_themes.items():
-        if theme_toml not in existing_themes:
+    for theme_dir, theme in available_themes.items():
+        if theme_dir not in existing_themes:
             HugoTheme.objects.create(
                 name=theme.name,
-                toml_path=theme_toml,
+                relative_dir=str(theme_dir),
                 description=theme.description,
                 active=True,
             )
@@ -74,4 +75,4 @@ def sync_themes(path: Path = HUGO_THEMES_ROOT):
     # deactivate themes that are no longer available
     for existing_theme in existing_themes:
         if existing_theme not in available_themes:
-            HugoTheme.objects.filter(toml_path=existing_theme).update(active=False)
+            HugoTheme.objects.filter(relative_dir=existing_theme).update(active=False)

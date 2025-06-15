@@ -29,6 +29,21 @@ class DjangoHugoConfig(AppConfig):
     name = "django_hugo"
     verbose_name = _("Django Hugo")
 
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize the DjangoHugoConfig app configuration.
+        This sets up the app name and verbose name for the Django application.
+        """
+        super().__init__(*args, **kwargs)
+        logger.debug("Initializing DjangoHugoConfig with name: %s", self.name)
+        # These internal attributes were created for use in unit tests where we don't
+        # want to interfere with the configured settings. We let them be None here only
+        # so the config will load without error. In real use, the checks should ensure
+        # that the settings are defined.
+        self._sites_root = getattr(settings, "HUGO_SITES_ROOT", None)
+        self._themes_root = getattr(settings, "HUGO_THEMES_ROOT", None)
+        self._hugo_path = getattr(settings, "HUGO_PATH", None)
+
     def ready(self):
         logger.debug("DjangoHugoConfig in ready; loading checks, signals, and tasks")
         # Import the checks, signals, and tasks to ensure they are registered
@@ -41,7 +56,7 @@ class DjangoHugoConfig(AppConfig):
         This is configurable via the HUGO_SITES_ROOT setting.
         """
         # Note: Will raise an error if the setting is not defined
-        return Path(settings.HUGO_SITES_ROOT)
+        return Path(self._sites_root)
 
     @property
     def THEMES_ROOT(self) -> Path:
@@ -50,7 +65,7 @@ class DjangoHugoConfig(AppConfig):
         This is configurable via the HUGO_THEMES_ROOT setting.
         """
         # Note: Will raise an error if the setting is not defined
-        return Path(settings.HUGO_THEMES_ROOT)
+        return Path(self._themes_root)
 
     @property
     def HUGO_PATH(self) -> Path:
@@ -59,7 +74,7 @@ class DjangoHugoConfig(AppConfig):
         This is configurable via the HUGO_PATH setting.
         """
         # Note: Will raise an error if the setting is not defined
-        return Path(settings.HUGO_PATH)
+        return Path(self._hugo_path)
 
     @property
     def HUGO_COMMAND_TIMEOUT(self) -> int:

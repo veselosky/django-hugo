@@ -26,25 +26,48 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 config = apps.get_app_config("django_hugo")
-HUGO_THEMES_ROOT = str(config.THEMES_ROOT.resolve())  # Ensure we have an absolute path
+HUGO_THEMES_ROOT = config.THEMES_ROOT
 
 
 class HugoTheme(models.Model):
     """
     This model represents a Hugo theme that can be used by one or more Hugo sites.
     Themes are stored in the file system and this model provides metadata about them.
+    It is expected that themes may be organized in subdirectories under the
+    HUGO_THEMES_ROOT directory, and each theme must contain a theme.toml file
+    that defines its metadata.
+
+    NOTE: The model itself makes no guarantees about the existence of the theme
+    directory or the theme.toml file. It is the responsibility of the application
+    to ensure that the themes are properly installed and available in the file system.
+
+    The `relative_dir` field is the path to the theme directory relative to
+    the HUGO_THEMES_ROOT directory. This allows for themes to be organized
+    in subdirectories while still being uniquely identifiable.
+
+    The `name` field is the human-readable name of the theme, which should be unique.
+
+    The `description` field is optional and can be used to provide additional
+    information about the theme.
+
+    The `active` field indicates whether the theme is currently active and can be
+    used by Hugo sites. If a theme is not active, it will not be available for
+    selection in the Hugo site configuration.
+
+    The `dir_path` property returns a pathlib.Path representing the theme directory.
+
+    The `toml_path` property returns a pathlib.Path representing the theme.toml file
+    containing the theme metadata.
     """
 
     name = models.CharField(
         _("name"), max_length=255, unique=True, help_text=_("Name of the theme")
     )
-    toml_path = models.FilePathField(
-        verbose_name=_("path to theme.toml"),
-        path=HUGO_THEMES_ROOT,
+    relative_dir = models.CharField(
+        _("relative directory"),
         max_length=255,
-        recursive=True,
-        match=r"^theme\.toml$",
-        help_text=_("Path to the theme.toml file within the theme directory"),
+        unique=True,
+        help_text=_("Relative path to the theme directory under HUGO_THEMES_ROOT"),
     )
     description = models.TextField(
         _("description"),
@@ -68,6 +91,12 @@ class HugoTheme(models.Model):
     def dir_path(self) -> pathlib.Path:
         """
         Returns the file system path to the theme directory.
-        This is constructed based on the theme's slug and the configured theme root.
         """
-        return pathlib.Path(self.toml_path).parent
+        return pathlib.Path(config.THEMES_ROOT).joinpath(self.relative_dir)
+
+    @property
+    def toml_path(self) -> pathlib.Path:
+        """
+        Returns the file system path to the theme.toml file.
+        """
+        return self.dir_path / "theme.toml"

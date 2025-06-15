@@ -17,6 +17,7 @@
 This module contains Pydantic models for Hugo's theme.toml file.
 """
 
+import logging
 from pathlib import Path
 
 import tomli
@@ -30,6 +31,8 @@ from pydantic import (
     model_validator,
 )
 from typing_extensions import Self
+
+logger = logging.getLogger(__name__)
 
 
 class Author(BaseModel):
@@ -83,11 +86,14 @@ class ThemeMetadata(BaseModel):
             raise ValueError("Screenshot must be a PNG or JPG file")
 
         try:
-            img = Image.open(path)
+            with Image.open(path) as img:
+                width, height = img.size
         except Exception as e:
-            raise ValueError(f"Cannot open screenshot image: {e}")
+            logger.exception("Error reading screenshot image %s", path)
+            raise ValueError(f"Cannot read screenshot image: {e}")
+        finally:
+            img.close()
 
-        width, height = img.size
         if width < 1500 or height < 1000:
             raise ValueError(
                 f"Screenshot must be at least 1500×1000 pixels (got {width}×{height})"
@@ -116,11 +122,14 @@ class ThemeMetadata(BaseModel):
             raise ValueError("Thumbnail must be a PNG or JPG file")
 
         try:
-            img = Image.open(path)
+            with Image.open(path) as img:
+                width, height = img.size
         except Exception as e:
-            raise ValueError(f"Cannot open thumbnail image: {e}")
+            logger.exception("Error reading thumbnail image %s", path)
+            raise ValueError(f"Cannot read thumbnail image: {e}")
+        finally:
+            img.close()
 
-        width, height = img.size
         if width < 900 or height < 600:
             raise ValueError(
                 f"Thumbnail must be at least 900×600 pixels (got {width}×{height})"

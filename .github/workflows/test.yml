@@ -33,7 +33,16 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install "tox>=4.7.0" "tox-gh-actions>=3.0.0"
 
+      - name: Debug environment
+        run: |
+          pwd
+          ls -la
+          hugo version
+          python --version
+          pip --version
+          tox --version
+
       - name: Run the test suite
         env:
-          HUGO_PATH: hugo
+          HUGO_PATH: bin/hugo
         run: tox run

@@ -1,3 +1,7 @@
+# Specific to django-hugo: Ignore hugo-generated output files
+tests/sites/*/public/
+tests/sites/*/.hugo_build.lock
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

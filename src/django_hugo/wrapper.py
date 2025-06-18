@@ -211,3 +211,62 @@ class HugoWrapper:
                 "Failed to get Hugo site configuration for site: %s", self.site_path
             )
             return None
+
+    def build(
+        self,
+        destination: str | Path | None = None,
+        source: str | Path | None = None,
+        draft: bool = False,
+        environment: str | None = None,
+        minify: bool = True,
+        verbose: bool = False,
+    ) -> bool:
+        """
+        Build the Hugo site.
+
+        Args:
+            destination (str|Path, optional): The destination directory for the build.
+                If None, uses the default 'public' directory.
+            source (str|Path, optional): The source directory for the build.
+                If None, uses the site path.
+            draft (bool, optional): If true, include draft and future content.
+                Defaults to False.
+            environment (str, optional): The environment to use for the build.
+                Defaults to None.
+            minify (bool, optional): If true, minify the output. Defaults to True.
+            verbose (bool, optional): If true, outputs template metrics and hints.
+                Defaults to False.
+
+        Returns:
+            bool: True if the build was successful, False otherwise.
+        """
+        command = ["build"]
+        if destination:
+            command.extend(["-d", str(destination)])
+
+        if source:
+            command.extend(["-s", str(source)])
+        elif not self.site_path:
+            logger.error("No site path specified for building Hugo site.")
+            raise ValueError("No site path specified for building Hugo site.")
+
+        if draft:
+            command.append("--buildDrafts")
+            command.append("--buildFuture")
+        if environment:
+            command.extend(["--environment", environment])
+        if minify:
+            command.append("--minify")
+        if verbose:
+            command.append("--templateMetrics")
+            command.append("--templateMetricsHints")
+
+        output = self.run_command(*command)
+        if output:
+            logger.info("Hugo site (%s) built successfully.", source or self.site_path)
+            return True
+        else:
+            logger.error(
+                "Failed to build Hugo site (%s): %s", source or self.site_path, output
+            )
+            return False

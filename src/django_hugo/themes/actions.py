@@ -17,6 +17,7 @@
 This module contains actions related to Hugo themes.
 """
 
+import logging
 from pathlib import Path
 
 from django.apps import apps
@@ -29,6 +30,8 @@ config = apps.get_app_config("django_hugo")
 HUGO_THEMES_ROOT = config.THEMES_ROOT
 
 __all__ = ["find_theme_files", "sync_themes"]
+
+logger = logging.getLogger(__name__)
 
 
 def find_theme_files(path: Path = HUGO_THEMES_ROOT) -> list[Path]:
@@ -61,10 +64,13 @@ def sync_themes(path: Path = HUGO_THEMES_ROOT):
         str(theme_file.parent.relative_to(path)): load_theme_metadata(theme_file)
         for theme_file in find_theme_files(path)
     }
+    logger.debug("Found %d themes in %s", len(available_themes), path)
     existing_themes = HugoTheme.objects.values_list("relative_dir", flat=True)
+    logger.debug("Found %d existing themes in the database", len(existing_themes))
 
     for theme_dir, theme in available_themes.items():
         if theme_dir not in existing_themes:
+            logger.info("Creating HugoTheme for %s", theme_dir)
             HugoTheme.objects.create(
                 name=theme.name,
                 relative_dir=str(theme_dir),
@@ -75,4 +81,5 @@ def sync_themes(path: Path = HUGO_THEMES_ROOT):
     # deactivate themes that are no longer available
     for existing_theme in existing_themes:
         if existing_theme not in available_themes:
+            logger.info("Deactivating HugoTheme for %s", existing_theme)
             HugoTheme.objects.filter(relative_dir=existing_theme).update(active=False)

@@ -68,7 +68,6 @@ class HugoSiteCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = HugoSite
     form_class = HugoSiteForm
     template_name = "hugo/sites/site_form.html"
-    success_url = reverse_lazy("hugo:site_list")
     success_message = _("Hugo site created successfully.")
 
     def form_valid(self, form):

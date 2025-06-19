@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock title %}
+{% block content %}
+<h1>Welcome to the Django-Hugo Test Project</h1>
+<p>This is a simple Django project to test the integration with Hugo.</p>
+<p>If you're seeing this message, presumably you have completed these first steps already:</p>
+<ol class="text-muted">
+  <li>Run <code>python manage.py migrate</code> to set up the database.</li>
+  <li>Run <code>python manage.py runserver</code> to start the development server.</li>
+</ol>
+<p>To get started from here:</p>
+<ol class="border">
+  <li>Run <code>python manage.py hugosync</code> to load the default theme(s) into the database.</li>
+  <li>Run <code>python manage.py createsuperuser</code> to create a user.</li>
+  <li><a href="{% url "login" %}">Log in.</a></li>
+  <li>Visit <a href="{% url 'hugo_index' %}">Your Sites</a> to manage your Hugo sites.</li>
+</ol>
+
+{% endblock content %}

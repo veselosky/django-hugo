@@ -45,6 +45,7 @@ class HugoSite(models.Model):
 
     # User-editable fields that define the Hugo site.
     name = models.CharField(
+        _("name"),
         max_length=255,
         help_text=_("Administrative name for the Hugo site (not used in Hugo)"),
     )

@@ -1,0 +1,18 @@
+{% extends "hugo/hugo_base.html" %}{% load crispy_forms_tags %}
+{% block extra_head %}
+    {{ block.super }}
+    {{ form.media }}
+{% endblock extra_head %}
+{% block content %}
+<div class="col-md-6 offset-md-3">
+    <h1>{% if form.instance.pk %}Edit Site{% else %}Create Site{% endif %}</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Update Site{% else %}Create Site{% endif %}</button>
+            <a href="{% url 'hugo_index' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock content %}

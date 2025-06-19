@@ -20,7 +20,7 @@ Forms used by the Hugo Sites views.
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from django_hugo.sites.models import HugoSite
+from django_hugo.models import HugoSite, HugoTheme
 
 
 class HugoSiteForm(forms.ModelForm):
@@ -29,25 +29,17 @@ class HugoSiteForm(forms.ModelForm):
     form also includes fields to populate the hugo.toml configuration.
     """
 
-    title = forms.CharField(
-        max_length=255,
-        required=True,
-        label=_("Site Title"),
-        help_text=_("Title of the Hugo site, used in the site configuration"),
-    )
-    base_url = forms.URLField(
-        required=False,
-        label=_("Base URL"),
-        help_text=_(
-            "Full base URL for the Hugo site, starting with 'http' and ending with '/'"
-        ),
-    )
-    copyright = forms.CharField(
-        max_length=255,
-        required=False,
-        label=_("Copyright <year> by:"),
-        help_text=_("Copyright notice for the Hugo site, used in the site footer"),
-    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # For now allow select a theme. We'll implement theme browser soon.
+        self.fields["theme"].queryset = HugoTheme.objects.filter(active=True)
+        # Disable fields that should not be edited by users
+        for field in ("archived", "last_published", "has_unpublished_changes"):
+            if self.instance and self.instance.pk:
+                self.fields[field].disabled = True
+            else:
+                # Do not include the field for creation
+                del self.fields[field]
 
     class Meta:
         model = HugoSite
@@ -58,15 +50,17 @@ class HugoSiteForm(forms.ModelForm):
             "description",
             "copyright",
             "base_url",
+            "pager_size",
+            "enable_emoji",
+            "enable_robots",
             "theme",
             "archived",
+            "last_published",
+            "has_unpublished_changes",
         ]
         labels = {
             "name": _("Site Name"),
             "slug": _("Short Name"),
-            "description": _("Description"),
-            "theme": _("Theme"),
-            "archived": _("Archived"),
         }
         help_texts = {
             "name": _("Administrative name, not used in the site itself"),
@@ -80,7 +74,7 @@ class HugoSiteForm(forms.ModelForm):
         }
 
 
-class HugoListSiteForm(forms.Form):
+class HugoSiteListForm(forms.Form):
     """
     Form for listing Hugo sites. This form is used to filter and search for sites.
     """

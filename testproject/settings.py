@@ -95,6 +95,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "django_hugo",
+    "crispy_forms",
+    "crispy_bootstrap5",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -114,11 +116,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "testproject.urls"
-
+LOGIN_REDIRECT_URL = "hugo_index"
+LOGOUT_REDIRECT_URL = "index"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "testproject" / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -129,6 +132,7 @@ TEMPLATES = [
         },
     },
 ]
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 WSGI_APPLICATION = "testproject.wsgi.application"
 

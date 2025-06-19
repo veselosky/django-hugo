@@ -18,5 +18,11 @@
     "-p",
     "*test*.py",
     "./tests"
+  ],
+  "emmet.includeLanguages": {
+    "django-html": "html"
+  },
+  "cSpell.words": [
+    "endfor"
   ]
 }

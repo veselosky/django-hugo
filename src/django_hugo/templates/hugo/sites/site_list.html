@@ -1,7 +1,7 @@
 {% extends "hugo/hugo_base.html" %}
 {% block content %}
 <h1>Your Sites</h1>
-<p><a href="{% url 'hugo_site_create' %}" class="btn btn-success">Create New Site</a>
+<p><a href="{% url 'hugo:site_create' %}" class="btn btn-success">Create New Site</a>
 </p>
 <table class="table table-striped">
   <thead>
@@ -17,9 +17,9 @@
       <td>{{ site.name }}</td>
       <td>{{ site.path }}</td>
       <td>
-        <a href="{% url 'hugo_site_detail' site.pk %}" class="btn btn-primary">View</a>
-        <a href="{% url 'hugo_site_edit' site.pk %}" class="btn btn-secondary">Edit</a>
-        <a href="{% url 'hugo_site_delete' site.pk %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'hugo:site_detail' site.slug %}" class="btn btn-primary">View</a>
+        <a href="{% url 'hugo:site_edit' site.slug %}" class="btn btn-secondary">Edit</a>
+        <a href="{% url 'hugo:site_delete' site.slug %}" class="btn btn-danger">Delete</a>
       </td>
     </tr>
     {% empty %}

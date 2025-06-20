@@ -34,7 +34,7 @@
         </a>
         <ul class="nav nav-pills">
           <li class="nav-item"><a href="{% url "index" %}" class="nav-link active" aria-current="page">Home</a></li>
-          <li class="nav-item"><a href="{% url "hugo_index" %}" class="nav-link">Sites</a></li>
+          <li class="nav-item"><a href="{% url "hugo:index" %}" class="nav-link">Sites</a></li>
           {% if request.user.is_authenticated %}
           <li class="nav-item"><a href="{% url "logout" %}" class="nav-link">Log out</a></li>
           {% else %}

@@ -17,28 +17,29 @@ from django.urls import path
 
 from django_hugo.sites import views
 
+app_name = "hugo"
 urlpatterns = [
     path(
         "create/",
         views.HugoSiteCreateView.as_view(),
-        name="hugo_site_create",
+        name="site_create",
     ),
-    # path("hugo/<slug:site_slug>/build/", views.hugo_build, name="hugo_build"),
-    # path("hugo/<slug:site_slug>/logs/", views.hugo_logs, name="hugo_logs"),
+    # path("<slug:slug>/build/", views.build, name="build"),
+    # path("<slug:slug>/logs/", views.logs, name="logs"),
     path(
         "<slug:slug>/delete/",
         views.HugoSiteDeleteView.as_view(),
-        name="hugo_site_delete",
+        name="site_delete",
     ),
     path(
         "<slug:slug>/edit/",
         views.HugoSiteUpdateView.as_view(),
-        name="hugo_site_edit",
+        name="site_edit",
     ),
     path(
         "<slug:slug>/",
         views.HugoSiteDetailView.as_view(),
-        name="hugo_site_detail",
+        name="site_detail",
     ),
-    path("", views.HugoSiteListView.as_view(), name="hugo_index"),
+    path("", views.HugoSiteListView.as_view(), name="index"),
 ]

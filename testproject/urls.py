@@ -34,9 +34,24 @@ from importlib.util import find_spec
 
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LogoutView as DjangoLogoutView
 from django.urls import include, path
 from django.views.generic import TemplateView
+
+
+# In Django 5.x, using LogoutView with GET no longer works, so we have to DIY it
+class LogoutView(DjangoLogoutView):
+    http_method_names = ["get", "post", "options"]
+
+    def get_template_names(self) -> list[str]:
+        if self.request.method == "GET":
+            return ["registration/logout.html"]
+        return super().get_template_names()
+
+    def get(self, request):
+        return self.render_to_response({})
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),

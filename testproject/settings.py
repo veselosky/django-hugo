@@ -116,7 +116,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "testproject.urls"
-LOGIN_REDIRECT_URL = "hugo_index"
+LOGIN_REDIRECT_URL = "hugo:index"
 LOGOUT_REDIRECT_URL = "index"
 TEMPLATES = [
     {

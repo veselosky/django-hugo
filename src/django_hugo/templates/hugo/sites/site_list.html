@@ -7,7 +7,9 @@
   <thead>
     <tr>
       <th scope="col">Name</th>
-      <th scope="col">Path</th>
+      <th scope="col">URL</th>
+      <th scope="col">Last Published</th>
+      <th scope="col">Publish Status</th>
       <th scope="col">Actions</th>
     </tr>
   </thead>
@@ -15,16 +17,29 @@
     {% for site in sites %}
     <tr>
       <td>{{ site.name }}</td>
-      <td>{{ site.path }}</td>
+      <td>{{ site.base_url }}</td>
+      <td>{{ site.date_published|date }}</td>
+      <td>{% if site.has_unpublished_changes %}
+        <span class="badge bg-warning">Unpublished Changes</span>
+        Modified {{ site.date_modified|date }}
+        {% else %}
+        <span class="badge bg-success">Up to date</span>
+        {% endif %}
+      </td>
       <td>
-        <a href="{% url 'hugo:site_detail' site.slug %}" class="btn btn-primary">View</a>
-        <a href="{% url 'hugo:site_edit' site.slug %}" class="btn btn-secondary">Edit</a>
-        <a href="{% url 'hugo:site_delete' site.slug %}" class="btn btn-danger">Delete</a>
+        <a
+          href="{% url 'hugo:site_detail' site.slug %}"
+          class="btn btn-primary"
+          aria-label="Work on {{ site.name }}">Work on</a>
+        <a
+          href="{% url 'hugo:site_edit' site.slug %}"
+          class="btn btn-secondary"
+          aria-label="Edit settings for {{ site.name }}">Settings</a>
       </td>
     </tr>
     {% empty %}
     <tr>
-      <td colspan="3">No sites available.</td>
+      <td colspan="5">No sites available.</td>
     </tr>
     {% endfor %}
   </tbody>

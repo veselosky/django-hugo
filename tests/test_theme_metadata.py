@@ -62,6 +62,8 @@ class TestThemeMetadata(unittest.TestCase):
         metadata = load_theme_metadata(toml_file)
         self.assertEqual(metadata.name, "Test Theme")
         self.assertEqual(metadata.license, "MIT")
+        self.assertTrue(metadata.screenshot.is_file())
+        self.assertTrue(metadata.thumbnail.is_file())
 
     def test_invalid_author_fields(self):
         # Create valid images

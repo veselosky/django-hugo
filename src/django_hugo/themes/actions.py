@@ -21,6 +21,7 @@ import logging
 from pathlib import Path
 
 from django.apps import apps
+from django.core.files.uploadedfile import UploadedFile
 from django.db import transaction
 
 from django_hugo.themes.config import load_theme_metadata
@@ -71,12 +72,27 @@ def sync_themes(path: Path = HUGO_THEMES_ROOT):
     for theme_dir, theme in available_themes.items():
         if theme_dir not in existing_themes:
             logger.info("Creating HugoTheme for %s", theme_dir)
-            HugoTheme.objects.create(
-                name=theme.name,
-                relative_dir=str(theme_dir),
-                description=theme.description,
-                active=True,
-            )
+            with theme.screenshot.open("rb") as screenshot_file:
+                screenshot = UploadedFile(
+                    file=screenshot_file,
+                    name=theme.screenshot.name,
+                    content_type="image/png",
+                )
+                with theme.thumbnail.open("rb") as thumbnail_file:
+                    thumbnail = UploadedFile(
+                        file=thumbnail_file,
+                        name=theme.thumbnail.name,
+                        content_type="image/png",
+                    )
+                    HugoTheme.objects.create(
+                        name=theme.name,
+                        relative_dir=str(theme_dir),
+                        description=theme.description,
+                        active=True,
+                        demosite=theme.demosite or "",
+                        thumbnail=thumbnail,
+                        screenshot=screenshot,
+                    )
 
     # deactivate themes that are no longer available
     for existing_theme in existing_themes:

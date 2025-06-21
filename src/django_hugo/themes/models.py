@@ -29,6 +29,15 @@ config = apps.get_app_config("django_hugo")
 HUGO_THEMES_ROOT = config.THEMES_ROOT
 
 
+def theme_images_upload_to(instance, filename):
+    """
+    Custom upload_to function for theme images.
+    This function ensures that images are uploaded to the correct directory
+    based on the theme's relative directory.
+    """
+    return pathlib.Path("themes", instance.relative_dir, filename).as_posix()
+
+
 class HugoTheme(models.Model):
     """
     This model represents a Hugo theme that can be used by one or more Hugo sites.
@@ -73,6 +82,20 @@ class HugoTheme(models.Model):
         _("description"),
         blank=True,
         help_text=_("Optional description of the Hugo theme"),
+    )
+    thumbnail = models.ImageField(
+        _("thumbnail"),
+        upload_to=theme_images_upload_to,
+        help_text=_("thumbnail image for the theme (900x600px)"),
+    )
+    screenshot = models.ImageField(
+        _("screenshot"),
+        upload_to=theme_images_upload_to,
+        help_text=_("screenshot image for the theme (1500x1000px)"),
+    )
+    demosite = models.URLField(
+        _("demo site"),
+        blank=True,
     )
     active = models.BooleanField(
         _("active"),

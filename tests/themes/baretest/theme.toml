@@ -1,6 +1,6 @@
-name = "Bare Test Theme"
+name = "Test Theme, Bare"
 license = "MIT"
-description = "A bare theme for testing django-hugo. Outputs are for tests to parse, not for humans to read."
+description = "A theme for testing django-hugo. Outputs are for tests to parse, not for humans to read."
 
 # The home page of the theme, where the source can be found.
 homepage = "https://github.com/webquills/django-hugo"

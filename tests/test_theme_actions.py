@@ -1,13 +1,14 @@
 import tempfile
-import uuid
 from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.test import TestCase, override_settings
 
 from django_hugo.themes.actions import sync_themes
+from django_hugo.themes.config import load_theme_metadata
 from django_hugo.themes.models import HugoTheme
+
+here = Path(__file__).parent.resolve()
 
 
 class TestFindThemeFiles(TestCase):
@@ -62,10 +63,9 @@ class TestSyncThemes(TestCase):
         self.temp_dir.cleanup()
 
     def fake_load_theme_metadata(self, toml_path: Path):
-        # Return a fake theme object with required attributes
-        return SimpleNamespace(
-            name=f"Test Theme {uuid.uuid4()}", description="Dummy Description"
-        )
+        theme = load_theme_metadata(here / "themes" / "baretest" / "theme.toml")
+        theme.theme_dir = self.dummy_theme_dir
+        return theme
 
     def test_sync_creates_new_theme(self):
         # Ensure no themes exist initially
@@ -86,11 +86,15 @@ class TestSyncThemes(TestCase):
                 themes = HugoTheme.objects.all()
                 self.assertEqual(themes.count(), 1)
                 theme = themes.first()
+                if not theme:
+                    self.fail("No themes were created during sync")
                 self.assertTrue(theme.name.startswith("Test Theme"))
                 self.assertEqual(theme.dir_path, self.dummy_theme_dir.resolve())
                 self.assertEqual(theme.toml_path, self.theme_toml.resolve())
-                self.assertEqual(theme.description, "Dummy Description")
+                self.assertIn("A theme for testing", theme.description)
                 self.assertTrue(theme.active)
+                self.assertTrue(theme.thumbnail)
+                self.assertTrue(theme.screenshot)
 
     def test_sync_deactivates_missing_theme(self):
         # Create an existing theme in the db that isn't available in file system after sync

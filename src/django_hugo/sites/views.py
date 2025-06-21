@@ -50,8 +50,10 @@ class HugoSiteListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        # TODO: Implement filtering by user
-        return self.model.objects.filter(user=self.request.user)
+        # TODO: Implement sort/filter query params
+        qs = self.model.objects.filter(user=self.request.user)
+        qs = qs.order_by("-has_unpublished_changes", "title")
+        return qs
 
 
 class HugoSiteDetailView(LoginRequiredMixin, DetailView):

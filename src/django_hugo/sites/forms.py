@@ -33,13 +33,6 @@ class HugoSiteForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # For now allow select a theme. We'll implement theme browser soon.
         self.fields["theme"].queryset = HugoTheme.objects.filter(active=True)
-        # Disable fields that should not be edited by users
-        for field in ("archived", "last_published", "has_unpublished_changes"):
-            if self.instance and self.instance.pk:
-                self.fields[field].disabled = True
-            else:
-                # Do not include the field for creation
-                del self.fields[field]
 
     class Meta:
         model = HugoSite
@@ -54,9 +47,6 @@ class HugoSiteForm(forms.ModelForm):
             "enable_emoji",
             "enable_robots",
             "theme",
-            "archived",
-            "last_published",
-            "has_unpublished_changes",
         ]
         labels = {
             "name": _("Site Name"),

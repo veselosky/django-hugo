@@ -28,13 +28,14 @@ class HugoSiteAdmin(admin.ModelAdmin):
         "slug",
         "user",
         "theme",
-        "last_published",
-        "archived",
+        "date_published",
+        "date_modified",
+        "is_archived",
         "has_unpublished_changes",
     )
-    list_filter = ("archived", "theme", "user")
+    list_filter = ("is_archived", "theme", "user")
     search_fields = ("name", "slug", "title", "description")
-    readonly_fields = ("last_published", "has_unpublished_changes", "archived")
+    readonly_fields = ("date_published", "has_unpublished_changes", "is_archived")
     # TODO: actions = ["publish_site", "archive_site"]
     fieldsets = (
         (
@@ -59,8 +60,8 @@ class HugoSiteAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "user",
-                    "last_published",
-                    "archived",
+                    "date_published",
+                    "is_archived",
                     "has_unpublished_changes",
                 )
             },

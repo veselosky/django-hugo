@@ -1,0 +1,31 @@
+{% extends "hugo/hugo_base.html" %}
+{% block content %}
+<h1>Available Themes</h1>
+<div class="themes d-flex gap-3">
+  {% for theme in themes %}
+    <div class="card" style="width: 450px;">
+      <img
+        class="card-img-top"
+        src="{{ theme.thumbnail.url }}"
+        alt="{{ theme.name }}"
+        width="900"
+        height="600"
+        style="width: 450px; height: 300px;"
+      >
+      <div class="card-body">
+        <h2 class="card-title">{{ theme.name }}</h2>
+        <p class="card-text">{{ theme.description }}</p>
+        {% if theme.demosite %}
+          <a href="{{ theme.demosite }}" class="btn btn-secondary" target="_blank">View Demo Site</a>
+        {% endif %}
+        {% if next %}
+          <a href="{% url next next_args %}" class="btn btn-primary">Select {{ theme.name }}</a>
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <p>No themes available.</p>
+  {% endfor %}
+  </div>
+
+{% endblock content %}

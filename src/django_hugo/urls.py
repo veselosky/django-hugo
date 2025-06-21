@@ -16,6 +16,7 @@
 from django.urls import path
 
 from django_hugo.sites import views
+from django_hugo.themes.views import ThemeBrowserView
 
 app_name = "hugo"
 urlpatterns = [
@@ -23,6 +24,11 @@ urlpatterns = [
         "create/",
         views.HugoSiteCreateView.as_view(),
         name="site_create",
+    ),
+    path(
+        "themes/",
+        ThemeBrowserView.as_view(),
+        name="themes",
     ),
     # path("<slug:slug>/build/", views.build, name="build"),
     # path("<slug:slug>/logs/", views.logs, name="logs"),

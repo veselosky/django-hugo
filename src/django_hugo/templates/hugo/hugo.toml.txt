@@ -6,8 +6,8 @@ title = '{{ site.title }}'
 theme = '{{ site.theme }}'
 
 disableLiveReload = true
-enableEmoji = {{ site.enable_emoji }}
-enableRobotsTXT = {{ site.enable_robots }}
+enableEmoji = {{ site.enable_emoji|lower }}
+enableRobotsTXT = {{ site.enable_robots|lower }}
 pluralizeListTitles = false
 
 [pagination]

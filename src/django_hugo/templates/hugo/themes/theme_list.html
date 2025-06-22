@@ -1,6 +1,19 @@
 {% extends "hugo/hugo_base.html" %}
 {% block content %}
 <h1>Available Themes</h1>
+{% if next == "hugo:site_create" %}
+  <p class="alert alert-info">
+    Please select a theme to use with your new site. (Don't worry, you can change it later!)
+  </p>
+{% elif next %}
+  <p class="alert alert-info">
+    Select a new theme to use with your site.
+  </p>
+{% else %}
+  <p class="alert alert-info">
+    Browse the available themes below.
+  </p>
+{% endif %}
 <div class="themes d-flex gap-3">
   {% for theme in themes %}
     <div class="card" style="width: 450px;">
@@ -16,10 +29,18 @@
         <h2 class="card-title">{{ theme.name }}</h2>
         <p class="card-text">{{ theme.description }}</p>
         {% if theme.demosite %}
-          <a href="{{ theme.demosite }}" class="btn btn-secondary" target="_blank">View Demo Site</a>
+          <a
+            href="{{ theme.demosite }}"
+            class="btn btn-secondary"
+            target="_blank"
+            aria-label="View Demo Site for {{ theme.name }}"
+            >View Demo Site</a>
         {% endif %}
         {% if next %}
-          <a href="{% url next next_args %}" class="btn btn-primary">Select {{ theme.name }}</a>
+          <a
+            href="{{ next_url }}{% querystring next=None theme=theme.id %}"
+            class="btn btn-primary"
+            >Select {{ theme.name }}</a>
         {% endif %}
       </div>
     </div>

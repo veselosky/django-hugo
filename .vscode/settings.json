@@ -23,6 +23,7 @@
     "django-html": "html"
   },
   "cSpell.words": [
+    "elif",
     "endfor"
   ]
 }

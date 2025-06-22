@@ -15,6 +15,7 @@
 # along with this package.  If not, see <https://www.gnu.org/licenses/>.
 import logging
 
+from django.urls import reverse
 from django.views.generic import ListView
 
 from django_hugo.themes.models import HugoTheme
@@ -51,12 +52,9 @@ class ThemeBrowserView(ListView):
             next_args = self.request.GET.get("next_args", "")
             next_args_list = next_args.split(",") if next_args else []
             try:
-                next_url = self.request.resolver_match.reverse(
-                    next_view, args=next_args_list
-                )
+                next_url = reverse(next_view, args=next_args_list)
             except Exception:
                 # If the reverse fails, log the error and set next_url to None
-                # You might want to log this error using your logging framework
                 logger.exception(
                     "Error reversing URL for view `%s` with args `%s`",
                     next_view,
@@ -67,5 +65,7 @@ class ThemeBrowserView(ListView):
             next_url = None
         # Add the next URL to the context
         if next_url:
-            context["next"] = next_url
+            context["next"] = next_view
+            context["next_args"] = next_args
+            context["next_url"] = next_url
         return context

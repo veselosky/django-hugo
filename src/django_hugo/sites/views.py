@@ -18,6 +18,8 @@ This module implements the List, Detail, Create, Update, and Delete views for ma
 Hugo sites within the app.
 """
 
+from typing import Any
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponseRedirect
@@ -71,6 +73,15 @@ class HugoSiteCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = HugoSiteForm
     template_name = "hugo/sites/site_form.html"
     success_message = _("Hugo site created successfully.")
+
+    def get_initial(self) -> dict[str, Any]:
+        # Check the querystring for any valid input to pre-populate the form.
+        if self.request.GET:
+            Form = self.get_form_class()
+            form = Form(self.request.GET)
+            form.full_clean()  # Validate the form to populate cleaned_data
+            return form.cleaned_data
+        return super().get_initial()
 
     def form_valid(self, form):
         form.instance.user = (

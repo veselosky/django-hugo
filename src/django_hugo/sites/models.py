@@ -85,7 +85,6 @@ class HugoSite(models.Model):
     )
     base_url = models.URLField(
         _("base URL"),
-        blank=True,
         help_text=_("Base URL for the Hugo site (used in metadata and links)"),
     )
     title = models.CharField(
